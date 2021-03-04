@@ -332,7 +332,7 @@ function* intersect(...iterables) {
     const appearanceMap = new Map();
     for(const iterable of iterables) {
         for(const element of iterable) {
-            const appearances = appearanceMap.get(element) ?? new Set();
+            const appearances = appearanceMap.has(element) ? appearanceMap.get(element) : new Set();
             appearances.add(iterable);
             appearanceMap.set(element, appearances);
         }
@@ -428,7 +428,7 @@ extendAllIterables("sequenceEqual", sequenceEqual);
 function* skipWhile(iterable, predicate) {
     let skipping = true;
     for(const element of iterable) {
-        skipping &&= predicate(element);
+        skipping = skipping && predicate(element);
         if(!skipping) yield element;
     }
 }
@@ -437,7 +437,7 @@ extendAllIterables("skipWhile", skipWhile);
 function* takeWhile(iterable, predicate) {
     let taking = true;
     for(const element of iterable) {
-        taking &&= predicate(element);
+        taking = taking && predicate(element);
         if(taking) yield element;
     }
 }
