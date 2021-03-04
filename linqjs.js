@@ -474,10 +474,55 @@ function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultPr
 }
 extendAllIterables("groupJoin", groupJoin);
 
-/* TODO:
-    Aggregate
-    ElementAt
-    ElementAtOrDefault
-    SkipLast
-    TakeLast
-*/
+function aggregate(iterable, accumulator, seed, resultProjection) {
+    let accumulatorValue = seed;
+    for(const element of iterable) {
+        accumulatorValue = accumulator(accumulatorValue, element);
+    }
+    return resultProjection ? resultProjection(accumulatorValue) : accumulatorValue;
+}
+extendAllIterables("aggregate", aggregate);
+
+function elementAt(iterable, index) {
+    if(allowsDirectAccess(iterable)) {
+        if(index >= iterable.length) throw new Error('Index was beyond the end of the sequence');
+        return iterable[index];
+    }
+    let i = 0;
+    for(const element of sequence) {
+        if(i++ === index) return element;
+    }
+    throw new Error('Index was beyond the end of the sequence');
+}
+extendAllIterables("elementAt", elementAt);
+
+function elementAtOrDefault(iterable, index, defaultValue) {
+    if(allowsDirectAccess(iterable)) {
+        if(index >= iterable.length) return defaultValue;
+        return iterable[index];
+    }
+    let i = 0;
+    for(const element of sequence) {
+        if(i++ === index) return element;
+    }
+    return defaultValue;
+}
+extendAllIterables("elementAtOrDefault", elementAtOrDefault);
+
+function skipLast(iterable, toSkip) {
+    const array = supportsDirectAccess(iterable) ? iterable : iterable.toArray();
+    const stopIndex = array.length - toSkip;
+    for(let i = 0; i < stopIndex; i++) {
+        yield array[i];
+    }
+}
+extendAllIterables("skipLast", skipLast);
+
+function takeLast(iterable, toTake) {
+    const array = supportsDirectAccess(iterable) ? iterable : iterable.toArray();
+    const startIndex = array.length - toTake;
+    for(let i = startIndex; i < array.length; i++) {
+        yield array[i];
+    }
+}
+extendAllIterables("takeLast", takeLast);
