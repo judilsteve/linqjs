@@ -1,7 +1,7 @@
 
 # LinqJS
 
-LinqJS is a full-featured implementation of LINQ with zero runtime dependencies.
+LinqJS is a full implementation of LINQ extension methods in JavaScript, with **no** runtime dependencies.
 It is 17kB as raw source, 23kB as minified browser-level js, and <5kB gzipped.
 
 The methods on the [Enumerable class in .NET 5.0](https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-5.0) are used as the model for LinqJS.
