@@ -183,7 +183,7 @@ extendAllIterables("singleOrDefault", singleOrDefault);
 
 function single(iterable, predicate) {
     let foundElement = false;
-    let firstElement = defaultValue;
+    let firstElement;
     for(const element of iterable) {
         if(predicate ? predicate(element) : true) {
             if(foundElement) throw new Error('Sequence contained more than one element');
