@@ -1,0 +1,22 @@
+{
+  "name": "linqjs",
+  "version": "1.0.0",
+  "description": "Minimalist implementation of LINQ-style extension methods for JavaScript",
+  "main": "linqjs.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/judilsteve/linqjs.git"
+  },
+  "keywords": [
+    "linq"
+  ],
+  "author": "James Udiljak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/judilsteve/linqjs/issues"
+  },
+  "homepage": "https://github.com/judilsteve/linqjs#readme"
+}
