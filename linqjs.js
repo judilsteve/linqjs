@@ -154,11 +154,16 @@ function lastOrDefault(iterable, predicate, defaultValue) {
 extendAllIterables("lastOrDefault", lastOrDefault);
 
 function last(iterable, predicate) {
+    let gotMatch = false;
     let lastMatch;
     for(const element of iterable) {
-        if(predicate ? predicate(element) : true) lastMatch = element;
+        if(predicate ? predicate(element) : true) {
+            lastMatch = element;
+            gotMatch = true;
+        }
     }
-    return lastMatch ?? throw new Error('Sequence contained no elements');
+    if(!gotMatch) throw new Error('Sequence contained no elements');
+    return lastMatch;
 }
 extendAllIterables("last", last);
 
@@ -209,7 +214,7 @@ extendAllIterables("all", all);
 
 function contains(iterable, toFind) {
     if(iterable instanceof Set) return iterable.has(toFind);
-    foreach(const element in iterable) {
+    for(const element of iterable) {
         if(element === toFind) return true;
     }
     return false;
@@ -386,7 +391,7 @@ extendAllIterables("prepend", prepend);
 
 function* defaultIfEmpty(iterable, defaultValue) {
     let anyElements = false;
-    foreach(const element of iterable) {
+    for(const element of iterable) {
         yield element;
         anyElements = true;
     }
@@ -509,8 +514,8 @@ function elementAtOrDefault(iterable, index, defaultValue) {
 }
 extendAllIterables("elementAtOrDefault", elementAtOrDefault);
 
-function skipLast(iterable, toSkip) {
-    const array = supportsDirectAccess(iterable) ? iterable : iterable.toArray();
+function* skipLast(iterable, toSkip) {
+    const array = allowsDirectAccess(iterable) ? iterable : iterable.toArray();
     const stopIndex = array.length - toSkip;
     for(let i = 0; i < stopIndex; i++) {
         yield array[i];
@@ -518,9 +523,9 @@ function skipLast(iterable, toSkip) {
 }
 extendAllIterables("skipLast", skipLast);
 
-function takeLast(iterable, toTake) {
-    const array = supportsDirectAccess(iterable) ? iterable : iterable.toArray();
-    const startIndex = array.length - toTake;
+function* takeLast(iterable, toTake) {
+    const array = allowsDirectAccess(iterable) ? iterable : iterable.toArray();
+    const startIndex = Math.max(array.length - toTake, 0);
     for(let i = startIndex; i < array.length; i++) {
         yield array[i];
     }
