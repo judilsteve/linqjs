@@ -19,8 +19,8 @@ class OrderedIterable {
             for(let i = this.sortProjections.length - 1; i >= 0; i--) {
                 const { sortProjection, isDescending } = this.sortProjections[i];
                 const sortPredicate = isDescending
-                    ? (a, b) => sortProjection(a) > sortProjection(b)
-                    : (a, b) => sortProjection(b) > sortProjection(a);
+                    ? (a, b) => sortProjection(b) > sortProjection(a)
+                    : (a, b) => sortProjection(a) > sortProjection(b);
                 // TODO This needs to be a stable sort, and it isn't in a lot of older browser versions
                 this.array.sort(sortPredicate);
             }
@@ -276,6 +276,7 @@ function toMap(iterable, keyProjection, valueProjection) {
     for(const element of iterable) {
         map.set(keyProjection(element), valueProjection ? valueProjection(element) : element);
     }
+    return map;
 }
 extendAllIterables("toMap", toMap);
 
@@ -377,14 +378,14 @@ function thenByDescending(orderedIterable, sortProjection) {
 }
 extendAllIterables("thenByDescending", thenByDescending);
 
-function* append(iterable, element) {
+function* append(iterable, ...elements) {
     yield* iterable;
-    yield element;
+    yield* elements;
 }
 extendAllIterables("append", append);
 
-function* prepend(iterable, element) {
-    yield element;
+function* prepend(iterable, ...elements) {
+    yield* elements;
     yield* iterable;
 }
 extendAllIterables("prepend", prepend);
