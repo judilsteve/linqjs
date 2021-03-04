@@ -300,12 +300,12 @@ function groupBy(iterable, keyProjection) {
 extendAllIterables("groupBy", groupBy);
 
 function* zip(...iterables) {
-    const iterators = iterables.map(i => i.iterator);
+    const iterators = iterables.map(i => i[Symbol.iterator]());
     while(true) {
         const results = new Array(iterators.length);
         for(var i = 0; i < iterators.length; i++) {
             const result = iterators[i].next();
-            if(result.done) break;
+            if(result.done) return;
             results[i] = result.value;
         }
         yield results;
@@ -411,10 +411,10 @@ function* reverse(iterable) {
 }
 extendAllIterables("reverse", reverse);
 
-function* sequenceEqual(iterable, other) {
+function sequenceEqual(iterable, other) {
     if(iterable.length !== undefined && other.length !== undefined && iterable.length !== other.length) return false;
-    const iterator = iterable.iterator();
-    const otherIterator = iterable.otherIterator();
+    const iterator = iterable[Symbol.iterator]();
+    const otherIterator = other[Symbol.iterator]();
     while(true) {
         const result = iterator.next();
         const otherResult = otherIterator.next();
