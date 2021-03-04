@@ -1,25 +1,28 @@
 class OrderedIterable {
-    constructor(iterable, sortProjection) {
+    constructor(iterable, sortProjection, isDescending) {
         this.array = new Array(iterable.length);
         let i = 0;
         for(const element of iterable) {
             this.array[i++] = element;
         }
-        this.sortProjections = [sortProjection];
+        this.sortProjections = [{ sortProjection, isDescending }];
         this.sorted = false;
     }
 
-    addSort(sortProjection) {
-        this.sortProjections.push(sortProjection);
+    addSort(sortProjection, isDescending) {
+        this.sortProjections.push({ sortProjection, isDescending });
         this.sorted = false;
     }
 
     [Symbol.iterator]() {
         if(!this.sorted) {
             for(let i = this.sortProjections.length - 1; i >= 0; i--) {
-                const sortProjection = this.sortProjections[i];
+                const { sortProjection, isDescending } = this.sortProjections[i];
+                const sortPredicate = isDescending
+                    ? (a, b) => sortProjection(a) > sortProjection(b)
+                    : (a, b) => sortProjection(b) > sortProjection(a);
                 // TODO This needs to be a stable sort, and it isn't in a lot of older browser versions
-                this.array.sort((a, b) => sortProjection(a) > sortProjection(b));
+                this.array.sort(sortPredicate);
             }
             this.sorted = true;
         }
@@ -29,17 +32,17 @@ class OrderedIterable {
 
 // These don't exist in the global namespace
 const Generator = Object.getPrototypeOf(function* () {});
-const MapIterator = Object.getPrototypeOf(new Map().entries());
-const SetIterator = Object.getPrototypeOf(new Set().entries());
+const MapIteratorPrototype = Object.getPrototypeOf(new Map().entries());
+const SetIteratorPrototype = Object.getPrototypeOf(new Set().entries());
 
 const prototypes = [
     Array.prototype,
     String.prototype,
     NodeList.prototype,
     Map.prototype,
-    MapIterator,
+    MapIteratorPrototype,
     Set.prototype,
-    SetIterator,
+    SetIteratorPrototype,
     Generator.prototype,
     OrderedIterable.prototype
 ];
@@ -79,7 +82,7 @@ function allowsDirectAccess(iterable) {
 }
 
 function* skip(iterable, toSkip) {
-    if(allowsDirectAccess) {
+    if(allowsDirectAccess(iterable)) {
         for(let i = toSkip; i < iterable.length; i++) {
             yield iterable[i];
         }
@@ -97,7 +100,7 @@ function* skip(iterable, toSkip) {
 extendAllIterables("skip", skip);
 
 function* take(iterable, toTake) {
-    if(allowsDirectAccess) {
+    if(allowsDirectAccess(iterable)) {
         const stop = Math.min(toTake, iterable.length);
         for(let i = 0; i < stop; i++) {
             yield iterable[i];
@@ -348,12 +351,133 @@ function* except(iterable, ...toFilter) {
 extendAllIterables("except", except);
 
 function orderBy(iterable, sortProjection) {
-    return new OrderedIterable(iterable, sortProjection);
+    return new OrderedIterable(iterable, sortProjection, false);
 }
 extendAllIterables("orderBy", orderBy);
 
 function thenBy(orderedIterable, sortProjection) {
-    orderedIterable.addSort(sortProjection);
+    orderedIterable.addSort(sortProjection, false);
     return orderedIterable;
 }
 extendAllIterables("thenBy", thenBy);
+
+function orderByDescending(iterable, sortProjection) {
+    return new OrderedIterable(iterable, sortProjection, true);
+}
+extendAllIterables("orderByDescending", orderByDescending);
+
+function thenByDescending(orderedIterable, sortProjection) {
+    orderedIterable.addSort(sortProjection, true);
+    return orderedIterable;
+}
+extendAllIterables("thenByDescending", thenByDescending);
+
+function* append(iterable, element) {
+    yield* iterable;
+    yield element;
+}
+extendAllIterables("append", append);
+
+function* prepend(iterable, element) {
+    yield element;
+    yield* iterable;
+}
+extendAllIterables("prepend", prepend);
+
+function* defaultIfEmpty(iterable, defaultValue) {
+    let anyElements = false;
+    foreach(const element of iterable) {
+        yield element;
+        anyElements = true;
+    }
+    if(!anyElements) yield defaultValue;
+}
+extendAllIterables("defaultIfEmpty", defaultIfEmpty);
+
+function* reverse(iterable) {
+    const array = new Array(iterable.length);
+    let i = 0;
+    for(const element of iterable) {
+        array[i++] = element;
+    }
+    for(let j = array.length - 1; j >= 0; j--) {
+        yield array[j];
+    }
+}
+extendAllIterables("reverse", reverse);
+
+function* sequenceEqual(iterable, other) {
+    if(iterable.length !== undefined && other.length !== undefined && iterable.length !== other.length) return false;
+    const iterator = iterable.iterator();
+    const otherIterator = iterable.otherIterator();
+    while(true) {
+        const result = iterator.next();
+        const otherResult = otherIterator.next();
+        if(result.done || otherResult.done) return result.done === otherResult.done;
+        if(result.value !== otherResult.value) return false;
+    }
+}
+extendAllIterables("sequenceEqual", sequenceEqual);
+
+function* skipWhile(iterable, predicate) {
+    let skipping = true;
+    for(const element of iterable) {
+        skipping &&= predicate(element);
+        if(!skipping) yield element;
+    }
+}
+extendAllIterables("skipWhile", skipWhile);
+
+function* takeWhile(iterable, predicate) {
+    let taking = true;
+    for(const element of iterable) {
+        taking &&= predicate(element);
+        if(taking) yield element;
+    }
+}
+extendAllIterables("takeWhile", takeWhile);
+
+function* join(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
+    // If we can determine the lengths of the sequences
+    // we can optimise by making our temporary data structure out of the smaller one
+    let smaller, larger, smallerKeyProjection, largerKeyProjection;
+    if(iterable.length !== undefined && other.length !== undefined && iterable.length > other.length) {
+        smaller = other;
+        larger = iterable;
+        smallerKeyProjection = otherKeyProjection;
+        largerKeyProjection = keyProjection;
+        // Need to swap these
+        resultProjection = (a, b) => resultProjection(b, a);
+    } else {
+        smaller = iterable;
+        larger = other;
+        smallerKeyProjection = keyProjection;
+        largerKeyProjection = otherKeyProjection;
+    }
+
+    const grouped = smaller.groupBy(smallerKeyProjection);
+    for(const element of larger) {
+        const matching = grouped.get(largerKeyProjection(element));
+        for(const matchingElement of matching) {
+            yield resultProjection(matchingElement, element);
+        }
+    }
+}
+extendAllIterables("join", join);
+
+function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
+    const grouped = other.groupBy(otherKeyProjection);
+    for(const element of iterable) {
+        const matching = grouped.get(keyProjection(element));
+        yield resultProjection(element, matching);
+    }
+}
+extendAllIterables("groupJoin", groupJoin);
+
+/* TODO:
+    Aggregate
+    ElementAt
+    ElementAtOrDefault
+    SkipLast
+    TakeLast
+*/
