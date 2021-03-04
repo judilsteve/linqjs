@@ -444,7 +444,7 @@ extendAllIterables("takeWhile", takeWhile);
 
 function* join(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     // If we can determine the lengths of the sequences
-    // we can optimise by making our temporary data structure out of the smaller one
+    // we can optimise memory usage by making our temporary data structure out of the smaller one
     let smaller, larger, smallerKeyProjection, largerKeyProjection;
     if(iterable.length !== undefined && other.length !== undefined && iterable.length > other.length) {
         smaller = other;
