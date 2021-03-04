@@ -428,7 +428,7 @@ extendAllIterables("sequenceEqual", sequenceEqual);
 function* skipWhile(iterable, predicate) {
     let skipping = true;
     for(const element of iterable) {
-        skipping = skipping && predicate(element);
+        skipping &&= predicate(element);
         if(!skipping) yield element;
     }
 }
@@ -437,7 +437,7 @@ extendAllIterables("skipWhile", skipWhile);
 function* takeWhile(iterable, predicate) {
     let taking = true;
     for(const element of iterable) {
-        taking = taking && predicate(element);
+        taking &&= predicate(element);
         if(taking) yield element;
     }
 }
