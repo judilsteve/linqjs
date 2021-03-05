@@ -1,8 +1,9 @@
 
 # LinqJS
 
-LinqJS is a full implementation of LINQ extension methods in JavaScript, with **no** runtime dependencies.
-It is 18kB as raw source, 19kB as minified browser-level js, and <5kB gzipped.
+LinqJS is a full implementation of LINQ extension methods in JavaScript, with **no** runtime dependencies (unless transpiling for environments that do not support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)).
+
+LinqJS is 18kB as raw source, 25kB as minified browser-level js (using Babel, including regenerator-runtime), and 7kB gzipped.
 
 The methods on the [Enumerable class in .NET 5.0](https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-5.0) are used as the model for LinqJS.
 
@@ -48,10 +49,12 @@ const sortedFullNames = [
  - `GroupBy` returns a JavaScript `Map` (where each value is an `Array`) instead of an `IEnumerable<IGrouping>`.
  - `ToHashSet` has been renamed `ToSet`, to reflect its use of the native JavaScript `Set`.
  - `ToList` has not been ported, as JavaScript `Array`s already have mutable length.
+ - The following methods have had `linq` prepended to their name (e.g. `Concat` becomes `linqConcat`) to avoid conflicting with built-in methods: `Concat`, `Reverse`, `Join`.
 
 ## Caveats
 
- - No unit tests exist so far. Use this library at your own risk.
+ - Few unit tests exist so far. Use this library at your own risk.
+ - To use LinqJS in browsers that do not support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators), you will need to transpile using [babel](https://babeljs.io/), and import the [regenerator-runtime](https://www.npmjs.com/package/regenerator-runtime) module into your project so that the transpiled generator functions can run.
 
 ## Extras
 

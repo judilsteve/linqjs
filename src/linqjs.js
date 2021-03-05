@@ -36,26 +36,30 @@ class OrderedIterable {
 
 // These don't exist in the global namespace
 const Generator = Object.getPrototypeOf(function* () {});
-const MapIteratorPrototype = Object.getPrototypeOf(new Map().entries());
-const SetIteratorPrototype = Object.getPrototypeOf(new Set().entries());
 
 const prototypes = [
-    Array.prototype,
-    String.prototype,
-    NodeList.prototype,
-    Map.prototype,
-    MapIteratorPrototype,
-    Set.prototype,
-    SetIteratorPrototype,
-    Generator.prototype,
-    OrderedIterable.prototype
+    { name: 'Array', proto: Array.prototype },
+    { name: 'String', proto: String.prototype },
+    { name: 'NodeList', proto: NodeList.prototype },
+    { name: 'Map', proto: Map.prototype },
+    { name: 'Set', proto: Set.prototype },
+    { name: 'Generator', proto: Generator.prototype },
+    { name: 'OrderedIterable', proto: OrderedIterable.prototype }
 ];
 
 function extendAllIterables(name, func) {
     for(const proto of prototypes) {
-        Object.defineProperty(proto, name, {
+        if(proto.proto[name]) {
+            throw new Error(`Cannot add extension method '${name}' to prototype ${proto.name} as it already has this property defined`);
+        }
+        Object.defineProperty(proto.proto, name, {
             writable: false,
-            value: function(...args) { return func(this, ...args); }
+            value: function(...args) { 
+                // The commented code below would be preferred, but there is currently
+                // a bug in babel, so it transpiles to code that causes infinite recursion.
+                // return func(this, ...args);
+                return func.bind(null, this)(...args);
+            }
         });
     }
 }
@@ -79,7 +83,7 @@ function* selectMany(iterable, projection) {
     }
 }
 extendAllIterables("selectMany", selectMany);
-extendAllIterables("concat", (...iterables) => selectMany(iterables));
+extendAllIterables("linqConcat", (...iterables) => selectMany(iterables));
 
 function allowsDirectAccess(iterable) {
     return iterable instanceof Array
@@ -410,7 +414,7 @@ function* defaultIfEmpty(iterable, defaultValue) {
 }
 extendAllIterables("defaultIfEmpty", defaultIfEmpty);
 
-function* reverse(iterable) {
+function* linqReverse(iterable) {
     let array;
     if(allowsDirectAccess(iterable)) {
         array = iterable;
@@ -425,7 +429,7 @@ function* reverse(iterable) {
         yield array[i];
     }
 }
-extendAllIterables("reverse", reverse);
+extendAllIterables("linqReverse", linqReverse);
 
 function sequenceEqual(iterable, other) {
     if(iterable.length !== undefined && other.length !== undefined && iterable.length !== other.length) return false;
@@ -457,7 +461,7 @@ function* takeWhile(iterable, predicate) {
 }
 extendAllIterables("takeWhile", takeWhile);
 
-function* join(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
+function* linqJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     // If we can determine the lengths of the sequences
     // we can optimise memory usage by making our temporary data structure out of the smaller one
     let smaller, larger, smallerKeyProjection, largerKeyProjection;
@@ -483,7 +487,7 @@ function* join(iterable, other, keyProjection, otherKeyProjection, resultProject
         }
     }
 }
-extendAllIterables("join", join);
+extendAllIterables("linqJoin", linqJoin);
 
 function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     const grouped = other.groupBy(otherKeyProjection);
