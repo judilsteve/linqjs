@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: { linqjs: path.resolve(__dirname, "dist", "linqjs.js") },
+  entry: { "linqjs.min": path.resolve(__dirname, "src", "linqjs.js") },
   module: {
     rules: [
       {
