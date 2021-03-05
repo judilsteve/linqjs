@@ -40,14 +40,20 @@ const sortedFullNames = [
 
 ## Differences from .NET 5.0 Implementation
 
+ - All method names are in `camelCase` instead of `PascalCase`
  - The `Aggregate` method always takes its seed value as the *third* argument. This is because JavaScript does not support method overloads like C# does, so optional parameters are used instead.
  - Methods concerning the C# type system (e.g. `Cast`, `AsEnumerable`, `LongCount`, `OfType`) have not been ported.
  - Non-extension methods (e.g. `Empty`, `Range`, `Repeat`) have not been ported.
  - `ToDictionary` has been renamed `ToMap`, to reflect its use of the native JavaScript `Map`.
+ - `GroupBy` returns a JavaScript `Map` (where each value is an `Array`) instead of an `IEnumerable<IGrouping>`.
  - `ToHashSet` has been renamed `ToSet`, to reflect its use of the native JavaScript `Set`.
  - `ToList` has not been ported, as JavaScript `Array`s already have mutable length.
 
 ## Caveats
 
  - No unit tests exist so far. Use this library at your own risk.
- - Chains of `orderBy`/`thenBy`/`orderByDescending`/`thenByDescending` may return incorrect results on older browsers that use [unstable sorting algorithms](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#browser_compatibility).
+
+## Extras
+
+ - `aggregateBy` method which combines `groupBy` and `aggregate` into a single operation. `aggregateBy` is more performant than calling `groupBy` and then `aggregate` on each group, since it only traverses the source sequence once, does not need to create temporary arrays to hold the elements of each group.
+ - `chunkBy` method which transforms a sequence into a sequence of sequences (splits it into chunks), with each chunk having the number of elements specified by the method parameter (or less if the source sequence runs out of elements).
