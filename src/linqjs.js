@@ -16,14 +16,18 @@ class OrderedIterable {
 
     [Symbol.iterator]() {
         if(!this.sorted) {
-            for(let i = this.sortProjections.length - 1; i >= 0; i--) {
-                const { sortProjection, isDescending } = this.sortProjections[i];
-                const sortPredicate = isDescending
-                    ? (a, b) => sortProjection(b) > sortProjection(a)
-                    : (a, b) => sortProjection(a) > sortProjection(b);
-                // TODO This needs to be a stable sort, and it isn't in a lot of older browser versions
-                this.array.sort(sortPredicate);
+            const sortPredicate = (a, b) => {
+                for(const sort of this.sortProjections) {
+                    const { sortProjection, isDescending } = sort;
+                    const aProjection = sortProjection(a);
+                    const bProjection = sortProjection(b);
+                    if(aProjection === bProjection) continue;
+                    const comparisonResult = aProjection > bProjection ? 1 : -1;
+                    return isDescending ? -1 * comparisonResult : comparisonResult;
+                }
+                return 0;
             }
+            this.array.sort(sortPredicate);
             this.sorted = true;
         }
         return this.array.values();
@@ -63,13 +67,15 @@ function* select(iterable, projection) {
 extendAllIterables("select", select);
 
 function* where(iterable, predicate) {
-    for(const element of iterable) if(predicate(element)) yield element;
+    let i = 0;
+    for(const element of iterable) if(predicate(element, i++)) yield element;
 }
 extendAllIterables("where", where);
 
 function* selectMany(iterable, projection) {
+    let i = 0;
     for(const element of iterable) {
-        yield* (projection ? projection(element) : element);
+        yield* (projection ? projection(element, i++) : element);
     }
 }
 extendAllIterables("selectMany", selectMany);
@@ -100,26 +106,15 @@ function* skip(iterable, toSkip) {
 extendAllIterables("skip", skip);
 
 function* take(iterable, toTake) {
-    if(allowsDirectAccess(iterable)) {
-        const stop = Math.min(toTake, iterable.length);
-        for(let i = 0; i < stop; i++) {
-            yield iterable[i];
-        }
-        return;
-    }
-
     for(const element of iterable) {
-        if(toTake > 0) {
-            toTake--;
-            yield element;
-        } else {
-            break;
-        }
+        if(toTake--) yield element;
+        else break;
     }
 }
 extendAllIterables("take", take);
 
 function count(iterable, predicate) {
+    if(iterable.length !== undefined && !predicate) return iterable.length;
     let count = 0;
     for(const element of iterable) {
         if(predicate ? predicate(element) : true) count++;
@@ -222,20 +217,20 @@ function contains(iterable, toFind) {
 extendAllIterables("contains", contains);
 
 function max(iterable, projection) {
-    let max = Number.MIN_VALUE;
+    let max;
     for(const element of iterable) {
         const number = projection ? projection(element) : element;
-        if(number > max) max = number;
+        if(max === undefined || number > max) max = number;
     }
     return max;
 }
 extendAllIterables("max", max);
 
 function min(iterable, projection) {
-    let min = Number.MAX_VALUE;
+    let min;
     for(const element of iterable) {
         const number = projection ? projection(element) : element;
-        if(number < min) min = number;
+        if(min === undefined || number < min) min = number;
     }
     return min;
 }
@@ -329,6 +324,17 @@ extendAllIterables("union", union);
 extendAllIterables("distinct", iterable => union(iterable));
 
 function* intersect(...iterables) {
+    if(iterables.length === 0) return;
+    else if(iterables.length === 1) {
+        yield* iterables[0].toSet();
+        return;
+    } else if(iterables.length === 2) {
+        const set = iterables[0].toSet();
+        for(const element of iterables[1]) {
+            if(set.has(element)) yield element;
+        }
+        return;
+    }
     const appearanceMap = new Map();
     for(const iterable of iterables) {
         for(const element of iterable) {
@@ -344,6 +350,10 @@ function* intersect(...iterables) {
 extendAllIterables("intersect", intersect);
 
 function* except(iterable, ...toFilter) {
+    if(!toFilter.length) {
+        yield* iterable;
+        return;
+    }
     const allToRemove = new Set();
     for(const toFilterIterable of toFilter) {
         for (const element of toFilterIterable) {
@@ -401,13 +411,18 @@ function* defaultIfEmpty(iterable, defaultValue) {
 extendAllIterables("defaultIfEmpty", defaultIfEmpty);
 
 function* reverse(iterable) {
-    const array = new Array(iterable.length);
-    let i = 0;
-    for(const element of iterable) {
-        array[i++] = element;
+    let array;
+    if(allowsDirectAccess(iterable)) {
+        array = iterable;
+    } else {
+        array = [];
+        let i = 0;
+        for(const element of iterable) {
+            array[i++] = element;
+        }
     }
-    for(let j = array.length - 1; j >= 0; j--) {
-        yield array[j];
+    for(let i = array.length - 1; i >= 0; i--) {
+        yield array[i];
     }
 }
 extendAllIterables("reverse", reverse);
@@ -435,10 +450,9 @@ function* skipWhile(iterable, predicate) {
 extendAllIterables("skipWhile", skipWhile);
 
 function* takeWhile(iterable, predicate) {
-    let taking = true;
     for(const element of iterable) {
-        taking &&= predicate(element);
-        if(taking) yield element;
+        if(!predicate(element)) break;
+        yield element;
     }
 }
 extendAllIterables("takeWhile", takeWhile);
@@ -532,3 +546,40 @@ function* takeLast(iterable, toTake) {
     }
 }
 extendAllIterables("takeLast", takeLast);
+
+function aggregateBy(iterable, keyProjection, seedProjection, accumulator, resultProjection) {
+    const map = new Map();
+    for(const element of iterable) {
+        const key = keyProjection(element);
+        let accumulatorForKey = map.has(key) ? map.get(key) : seedProjection(key, element);
+        accumulatorForKey = accumulator(accumulatorForKey, element, key);
+        map.set(key, accumulatorForKey);
+    }
+    if(resultProjection) {
+        for(const [key, value] of map) {
+            map.set(key, resultProjection(value, key));
+        }
+    }
+    return map;
+}
+extendAllIterables("aggregateBy", aggregateBy);
+
+function* getChunk(iterator, chunkSize, outResult) {
+    let toYield = chunkSize;
+    do {
+        yield outResult.value;
+        toYield--;
+        const result = iterator.next();
+        outResult.done = result.done;
+        outResult.value = result.value;
+    } while(toYield && !outResult.done)
+}
+
+function* chunkBy(iterable, chunkSize) {
+    const iterator = iterable[Symbol.iterator]();
+    let result = iterator.next();
+    while(!result.done) {
+        yield getChunk(iterator, chunkSize, result);
+    }
+}
+extendAllIterables("chunkBy", chunkBy);
