@@ -313,7 +313,7 @@ function groupBy(iterable, keyProjection) {
 }
 registerIterableExtension("groupBy", groupBy);
 
-function* zip(iterable, resultSelector, ...others) {
+function* zip(iterable, resultProjection, ...others) {
     const iterators = [iterable, ...others].map(i => i[Symbol.iterator]());
     while(true) {
         const results = new Array(iterators.length);
@@ -322,7 +322,7 @@ function* zip(iterable, resultSelector, ...others) {
             if(result.done) return;
             results[i] = result.value;
         }
-        yield resultSelector ? resultSelector(...results) : results;
+        yield resultProjection ? resultProjection(...results) : results;
     }
 }
 registerIterableExtension("zip", zip);
