@@ -518,3 +518,100 @@ test('Min', () => {
 });
 
 // Sum
+
+test('Sum: No elements, no projection', () => {
+    expect([].sum()).toBe(0);
+});
+
+test('Sum: No elements', () => {
+    expect([].sum(x => x + 1)).toBe(0);
+});
+
+test('Sum: No projection', () => {
+    expect([2,1,4,3].sum()).toBe(10);
+});
+
+test('Sum', () => {
+    expect([2,1,4,3].sum(x => x + 1)).toBe(14);
+});
+
+// Average
+
+test('Average: No elements, no projection', () => {
+    expect(() => [].average()).toThrow('Sequence contained no elements');
+});
+
+test('Average: No elements', () => {
+    expect(() => [].average(x => x + 1)).toThrow('Sequence contained no elements');
+});
+
+test('Average: No projection', () => {
+    expect([2,1,4,3].average()).toBe(2.5);
+});
+
+test('Average', () => {
+    expect([2,1,4,3].average(x => x + 1)).toBe(3.5);
+});
+
+// ToArray
+
+test('ToArray: No elements, no projection', () => {
+    const original = [];
+    const result = original.toArray();
+    expect(result).toStrictEqual(original);
+    expect(result).not.toBe(original);
+});
+
+test('ToArray: No projection', () => {
+    const original = [1,2,3];
+    const result = original.toArray();
+    expect(result).toStrictEqual(original);
+    expect(result).not.toBe(original);
+});
+
+test('ToArray: No elements', () => {
+    const original = [];
+    const result = original.toArray(x => Math.pow(x, 2));
+    expect(result).toStrictEqual(original);
+    expect(result).not.toBe(original);
+});
+
+test('ToArray', () => {
+    const original = [1,2,3];
+    const result = original.toArray(x => Math.pow(x, 2));
+    expect(result).toStrictEqual([1,4,9]);
+});
+
+// ToMap
+
+test('ToMap: No elements, no value projection', () => {
+    expect([].toMap(x => x)).toStrictEqual(new Map());
+});
+
+test('ToMap: No elements', () => {
+    expect([].toMap(x => x, x => x)).toStrictEqual(new Map());
+});
+
+test('ToMap: No value projection', () => {
+    const expected = new Map();
+    expected.set(1, {k: 1, v: 2});
+    expected.set(3, {k: 3, v: 4});
+    expected.set(5, {k: 5, v: 6});
+    expect(
+        [{k: 1, v: 2}, {k: 3, v: 4}, {k: 5, v: 6}]
+        .toMap(x => x.k))
+    .toStrictEqual(expected);
+});
+
+test('ToMap', () => {
+    const expected = new Map();
+    expected.set(1, 2);
+    expected.set(3, 4);
+    expected.set(5, 6);
+    expect(
+        [{k: 1, v: 2}, {k: 3, v: 4}, {k: 5, v: 6}]
+        .toMap(x => x.k, x => x.v))
+    .toStrictEqual(expected);
+});
+
+// ToSet
