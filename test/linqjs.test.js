@@ -219,3 +219,36 @@ test('SelectMany: No projection', () => {
 test('SelectMany', () => {
     expectAsArray([1,2,3,4].selectMany(x => [x,x])).toStrictEqual([1,1,2,2,3,3,4,4]);
 });
+
+// Concat
+
+test('Concat: Empty source, single empty argument', () => {
+    expectAsArray([].linqConcat([])).toStrictEqual([]);
+});
+
+test('Concat: Empty source, multiple empty arguments', () => {
+    expectAsArray([].linqConcat([],[])).toStrictEqual([]);
+});
+
+test('Concat: Single empty argument', () => {
+    expectAsArray([1,2,3].linqConcat([])).toStrictEqual([1,2,3]);
+});
+
+test('Concat: Multiple empty arguments', () => {
+    expectAsArray([1,2,3].linqConcat([],[])).toStrictEqual([1,2,3]);
+});
+
+test('Concat: Single argument', () => {
+    expectAsArray([1,2,3].linqConcat([4,5])).toStrictEqual([1,2,3,4,5]);
+});
+
+test('Concat', () => {
+    expectAsArray([1,2,3].linqConcat([4,5],[6,7])).toStrictEqual([1,2,3,4,5,6,7]);
+});
+
+// Skip
+
+// TODO_JU Test both arrays (direct access) and others
+function* generate(array) {
+    yield* array;
+}
