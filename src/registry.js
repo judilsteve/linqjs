@@ -39,5 +39,4 @@ export function registerIterableExtension(funcName, func) {
         extend(protoName, proto, funcName, func);
     }
     extensions.push({ funcName, func });
-    console.log(funcName);
 }
