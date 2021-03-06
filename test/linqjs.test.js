@@ -163,3 +163,37 @@ test('SingleOrDefault: Multiple elements, one match, default value', () => {
 test('SingleOrDefault: Multiple elements, multiple matches, default value', () => {
     expect(() => [52, 42, 42].singleOrDefault(x => x - 2 === 40, 'default')).toThrow('Sequence contained more than one element');
 });
+
+// Where
+
+function expectAsArray(valueOrFunction) {
+    let wrapped;
+    if(valueOrFunction instanceof Function) {
+        wrapped = () => [...valueOrFunction()];
+    } else {
+        wrapped = [...valueOrFunction];
+    }
+    return expect(wrapped);
+}
+
+test('Where: No elements', () => {
+    expectAsArray([].where(x => x)).toStrictEqual([]);
+});
+
+test('Where', () => {
+    expectAsArray([1,2,3,4,5].where(x => x % 2)).toStrictEqual([1,3,5]);
+});
+
+// Select
+
+test('Select: No elements', () => {
+    expectAsArray([].select(x => Math.pow(x, 2))).toStrictEqual([]);
+});
+
+test('Select: Basic projection', () => {
+    expectAsArray([1,2,3].select(x => Math.pow(x, 2))).toStrictEqual([1,4,9]);
+});
+
+test('Select: Indexed projection', () => {
+    expectAsArray([1,2,3].select((x, i) => Math.pow(x, 2) + i)).toStrictEqual([1,5,11]);
+})

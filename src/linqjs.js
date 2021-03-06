@@ -77,9 +77,8 @@ function* where(iterable, predicate) {
 extendAllIterables("where", where);
 
 function* selectMany(iterable, projection) {
-    let i = 0;
     for(const element of iterable) {
-        yield* (projection ? projection(element, i++) : element);
+        yield* (projection ? projection(element) : element);
     }
 }
 extendAllIterables("selectMany", selectMany);
