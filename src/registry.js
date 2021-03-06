@@ -1,6 +1,7 @@
 // This doesn't exist in the global namespace
 const Generator = Object.getPrototypeOf(function* () {});
 
+// TODO Make this a dictionary so that we can validate that names are unique
 const iterablePrototypes = [
     { protoName: 'Array', proto: Array.prototype },
     { protoName: 'String', proto: String.prototype },
@@ -10,6 +11,7 @@ const iterablePrototypes = [
     { protoName: 'Generator', proto: Generator.prototype }
 ];
 
+// TODO Make this a dictionary so that we can validate that names are unique
 const extensions = [];
 
 function extend(protoName, proto, funcName, func) {
