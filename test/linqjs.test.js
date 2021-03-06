@@ -658,3 +658,22 @@ test('Zip: Unequal sequence lengths', () => {
 test('Zip', () => {
     expectAsArray([1,2,3].zip((x, y, z) => x + y + z, [2,3,4], [3,4,5])).toStrictEqual([6,9,12]);
 });
+
+// Union
+
+test('Union: Empty sequences', () => {
+    expectAsArray([].union([], [])).toStrictEqual([]);
+});
+
+test('Union', () => {
+    expectAsArray([1,1,2].union([3,3,4], [2,3,1,5])).toStrictEqual([1,2,3,4,5]);
+});
+
+// Distinct
+
+test('Distinct', () => {
+    expectAsArray([1,1,2,1,3,4,2].distinct()).toStrictEqual([1,2,3,4]);
+});
+
+// Intersect
+// TODO Remember there are three distinct code paths for this function
