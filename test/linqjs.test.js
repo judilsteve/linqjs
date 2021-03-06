@@ -180,9 +180,13 @@ test('Where: No elements', () => {
     expectAsArray([].where(x => x)).toStrictEqual([]);
 });
 
-test('Where', () => {
+test('Where: Basic predicate', () => {
     expectAsArray([1,2,3,4,5].where(x => x % 2)).toStrictEqual([1,3,5]);
 });
+
+test('Where: Indexed predicate', () => {
+    expectAsArray([1,2,3,4,5].where((x, i) => x % 2 && i < 4)).toStrictEqual([1,3]);
+})
 
 // Select
 
@@ -196,4 +200,22 @@ test('Select: Basic projection', () => {
 
 test('Select: Indexed projection', () => {
     expectAsArray([1,2,3].select((x, i) => Math.pow(x, 2) + i)).toStrictEqual([1,5,11]);
-})
+});
+
+// SelectMany
+
+test('SelectMany: No elements, no projection', () => {
+    expectAsArray([].selectMany()).toStrictEqual([]);
+});
+
+test('SelectMany: No elements', () => {
+    expectAsArray([].selectMany(x => [x,x])).toStrictEqual([]);
+});
+
+test('SelectMany: No projection', () => {
+    expectAsArray([[1,2],[3,[4]]].selectMany()).toStrictEqual([1,2,3,[4]]);
+});
+
+test('SelectMany', () => {
+    expectAsArray([1,2,3,4].selectMany(x => [x,x])).toStrictEqual([1,1,2,2,3,3,4,4]);
+});
