@@ -55,8 +55,7 @@ const sortedFullNames = [
 
 ## Caveats
 
- - Few unit tests exist so far. Use this library at your own risk.
- - To use LinqJS in browsers that do not support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators), you will need to transpile using [babel](https://babeljs.io/), and import the [regenerator-runtime](https://www.npmjs.com/package/regenerator-runtime) module into your project so that the transpiled generator functions can run.
+ - To use LinqJS in environments that do not support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators), you will need to transpile LinqJS. If you decide to use [babel](https://babeljs.io/) to do this, you will need to import the [regenerator-runtime](https://www.npmjs.com/package/regenerator-runtime) module into your project so that the transpiled generator functions can be run.
 
 ## Extras
 
