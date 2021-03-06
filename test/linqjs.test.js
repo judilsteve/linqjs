@@ -14,8 +14,15 @@ test('First: No elements', () => {
     expect(() => [].first(x => x === 5)).toThrow('Sequence contained no elements');
 });
 
+test('First: No match', () => {
+    expectAsArray(() => [1,2,3].first(x => x === 5)).toThrow('Sequence contained no elements');
+});
+
 test('First', () => {
-    expect([1,2,3].first(x => x - 2 === 0)).toBe(2);
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, null, {val: 2, id: 2}, {val: 3, id: 3}]
+        .first(x => x.val === 2))
+    .toStrictEqual({val: 2, id: 1});
 });
 
 // FirstOrDefault
@@ -32,8 +39,15 @@ test('FirstOrDefault: No elements, no default value', () => {
     expect([].firstOrDefault(x => x === 5)).toBe(undefined);
 });
 
+test('FirstOrDefault: No match, no default value', () => {
+    expect([1,2,3].firstOrDefault(x => x === 5)).toBe(undefined);
+});
+
 test('FirstOrDefault: No default value', () => {
-    expect([1,2,3].firstOrDefault(x => x - 2 == 0)).toBe(2);
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, null, {val: 2, id: 2}, {val: 3, id: 3}]
+        .firstOrDefault(x => x.val === 2))
+    .toStrictEqual({val: 2, id: 1});
 });
 
 test('FirstOrDefault: No elements, no predicate', () => {
@@ -48,8 +62,15 @@ test('FirstOrDefault: No elements', () => {
     expect([].firstOrDefault(x => x === 5, 'default')).toBe('default');
 });
 
+test('FirstOrDefault: No match', () => {
+    expect([1,2,3].firstOrDefault(x => x === 5, 'default')).toBe('default');
+});
+
 test('FirstOrDefault', () => {
-    expect([1,2,3].firstOrDefault(x => x - 2 == 0, 'deafult')).toBe(2);
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, null, {val: 2, id: 2}, {val: 3, id: 3}]
+        .firstOrDefault(x => x.val === 2, 'default'))
+    .toStrictEqual({val: 2, id: 1});
 });
 
 // Single
@@ -333,3 +354,74 @@ test('Count', () => {
 });
 
 // Last
+
+test('Last: No elements, no predicate', () => {
+    expect(() => [].last()).toThrow('Sequence contained no elements');
+});
+
+test('Last: No predicate', () => {
+    expect([1,2,3].last()).toBe(3);
+});
+
+test('Last: No elements', () => {
+    expect(() => [].last(x => x === 5)).toThrow('Sequence contained no elements');
+});
+
+test('Last: No match', () => {
+    expectAsArray(() => [1,2,3].last(x => x === 5)).toThrow('Sequence contained no elements');
+});
+
+test('Last', () => {
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, {val: 3, id: 2}, {val: 2, id: 3}, {val: 3, id: 4}]
+        .last(x => x.val - 2 === 0))
+    .toStrictEqual({ val: 2, id: 3 });
+});
+
+// LastOrDefault
+
+test('LastOrDefault: No elements, no predicate, no default', () => {
+    expect([].lastOrDefault()).toBe(undefined);
+});
+
+test('LastOrDefault: No predicate, no default', () => {
+    expect([1,2,3].lastOrDefault()).toBe(3);
+});
+
+test('LastOrDefault: No elements, no default', () => {
+    expect([].lastOrDefault(x => x === 5)).toBe(undefined);
+});
+
+test('LastOrDefault: No match, no default', () => {
+    expect([1,2,3].lastOrDefault(x => x === 5)).toBe(undefined);
+});
+
+test('LastOrDefault: No default', () => {
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, {val: 3, id: 2}, {val: 2, id: 3}, {val: 3, id: 4}]
+        .lastOrDefault(x => x.val - 2 === 0))
+    .toStrictEqual({ val: 2, id: 3 });
+});
+
+test('LastOrDefault: No elements, no predicate', () => {
+    expect([].lastOrDefault(null, 'default')).toBe('default');
+});
+
+test('LastOrDefault: No predicate', () => {
+    expect([1,2,3].lastOrDefault(null, 'default')).toBe(3);
+});
+
+test('LastOrDefault: No elements', () => {
+    expect([].lastOrDefault(x => x === 5, 'default')).toBe('default');
+});
+
+test('LastOrDefault: No match', () => {
+    expect([1,2,3].lastOrDefault(x => x === 5, 'default')).toBe('default');
+});
+
+test('LastOrDefault', () => {
+    expect(
+        [{val: 1, id: 0}, {val: 2, id: 1}, {val: 3, id: 2}, {val: 2, id: 3}, {val: 3, id: 4}]
+        .lastOrDefault(x => x.val - 2 === 0, 'default'))
+    .toStrictEqual({ val: 2, id: 3 });
+});
