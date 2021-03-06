@@ -260,7 +260,7 @@ test('Skip: Direct access, skip whole sequence', () => {
     expectAsArray([1,2,3,4,5].skip(5)).toStrictEqual([]);
 });
 
-test('Skip: Direct access, skip more than whole sequence', () => {
+test('Skip: Direct access, skip past whole sequence', () => {
     expectAsArray([1,2,3,4,5].skip(100)).toStrictEqual([]);
 });
 
@@ -276,7 +276,7 @@ test('Skip: Skip whole sequence', () => {
     expectAsArray(generate([1,2,3,4,5]).skip(5)).toStrictEqual([]);
 });
 
-test('Skip: Skip more than whole sequence', () => {
+test('Skip: Skip past whole sequence', () => {
     expectAsArray(generate([1,2,3,4,5]).skip(100)).toStrictEqual([]);
 });
 
@@ -285,3 +285,18 @@ test('Skip: Empty sequence', () => {
 });
 
 // Take
+test('Take: Take whole sequence', () => {
+    expectAsArray([1,2,3].take(3)).toStrictEqual([1,2,3]);
+});
+
+test('Take: Take past whole sequence', () => {
+    expectAsArray([1,2,3].take(100)).toStrictEqual([1,2,3]);
+});
+
+test('Take: Empty sequence', () => {
+    expectAsArray([].take(100)).toStrictEqual([]);
+});
+
+test('Take', () => {
+    expectAsArray([1,2,3,4,5].take(3)).toStrictEqual([1,2,3]);
+});
