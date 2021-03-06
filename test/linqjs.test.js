@@ -700,3 +700,83 @@ test('Except', () => {
 });
 
 // OrderBy
+
+test('OrderBy', () => {
+    expectAsArray([3,2,1].orderBy(x => x)).toStrictEqual([1,2,3]);
+});
+
+// ThenBy
+
+test('ThenBy: Descending first', () => {
+    expectAsArray(
+        [{a: 1, b: 1}, {a:2, b: 1}, {a: 2, b: 2}]
+        .orderByDescending(x => x.a)
+        .thenBy(x => x.b))
+    .toStrictEqual([{a: 2, b: 1}, {a: 2, b: 2}, {a: 1, b: 1}]);
+});
+
+test('ThenBy', () => {
+    expectAsArray(
+        [{a: 2, b: 1}, {a:1, b: 2}, {a: 1, b: 1}]
+        .orderBy(x => x.a)
+        .thenBy(x => x.b))
+    .toStrictEqual([{a: 1, b: 1}, {a: 1, b: 2}, {a: 2, b: 1}]);
+});
+
+// OrderByDescending
+
+test('OrderByDescending', () => {
+    expectAsArray([1,2,3].orderByDescending(x => x)).toStrictEqual([3,2,1]);
+});
+
+// ThenByDescending
+
+test('ThenByDescending: Descending first', () => {
+    expectAsArray(
+        [{a: 1, b: 1}, {a:2, b: 1}, {a: 2, b: 2}]
+        .orderByDescending(x => x.a)
+        .thenByDescending(x => x.b))
+    .toStrictEqual([{a: 2, b: 2}, {a: 2, b: 1}, {a: 1, b: 1}]);
+});
+
+test('ThenByDescending', () => {
+    expectAsArray(
+        [{a: 2, b: 1}, {a:1, b: 1}, {a: 1, b: 2}]
+        .orderBy(x => x.a)
+        .thenByDescending(x => x.b))
+    .toStrictEqual([{a: 1, b: 2}, {a: 1, b: 1}, {a: 2, b: 1}]);
+});
+
+// Append
+
+test('Append', () => {
+    expectAsArray([1,2,3].append(4,5)).toStrictEqual([1,2,3,4,5]);
+});
+
+// Prepend
+
+test('Prepend', () => {
+    expectAsArray([1,2,3].prepend(4,5)).toStrictEqual([4,5,1,2,3]);
+});
+
+// DefaultIfEmpty
+
+test('DefaultIfEmpty: Empty', () => {
+    expectAsArray([].defaultIfEmpty('default')).toStrictEqual(['default']);
+});
+
+test('DefaultIfEmpty', () => {
+    expectAsArray([1,2,3].defaultIfEmpty('default')).toStrictEqual([1,2,3]);
+});
+
+// LinqReverse
+
+test('LinqReverse: Direct access', () => {
+    expectAsArray([1,2,3].linqReverse()).toStrictEqual([3,2,1]);
+});
+
+test('LinqReverse', () => {
+    expectAsArray(generate([1,2,3]).linqReverse()).toStrictEqual([3,2,1]);
+});
+
+// SequenceEqual TODO Two code paths: One for iterables with length, one without
