@@ -285,6 +285,7 @@ test('Skip: Empty sequence', () => {
 });
 
 // Take
+
 test('Take: Take whole sequence', () => {
     expectAsArray([1,2,3].take(3)).toStrictEqual([1,2,3]);
 });
@@ -300,3 +301,35 @@ test('Take: Empty sequence', () => {
 test('Take', () => {
     expectAsArray([1,2,3,4,5].take(3)).toStrictEqual([1,2,3]);
 });
+
+// Count
+
+test('Count: Empty sequence, no predicate, length property', () => {
+    expect([].count()).toBe(0);
+});
+
+test('Count: Empty sequence, length property', () => {
+    expect([].count(x => x === 42)).toBe(0);
+});
+
+test('Count: No predicate, length property', () => {
+    expect([5,5,5].count()).toBe(3);
+});
+
+test('Count: Length property', () => {
+    expect([5,4,4].count(x => x < 5)).toBe(2);
+});
+
+test('Count: Empty sequence, no predicate', () => {
+    expect(generate([]).count()).toBe(0);
+});
+
+test('Count: Empty sequence', () => {
+    expect(generate([]).count(x => x === 42)).toBe(0);
+});
+
+test('Count', () => {
+    expect(generate([5,4,4]).count(x => x < 5)).toBe(2);
+});
+
+// Last
