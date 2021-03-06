@@ -37,52 +37,66 @@ class OrderedIterable {
 // These don't exist in the global namespace
 const Generator = Object.getPrototypeOf(function* () {});
 
-const prototypes = [
-    { name: 'Array', proto: Array.prototype },
-    { name: 'String', proto: String.prototype },
-    { name: 'NodeList', proto: NodeList.prototype },
-    { name: 'Map', proto: Map.prototype },
-    { name: 'Set', proto: Set.prototype },
-    { name: 'Generator', proto: Generator.prototype },
-    { name: 'OrderedIterable', proto: OrderedIterable.prototype }
+const iterablePrototypes = [
+    { protoName: 'Array', proto: Array.prototype },
+    { protoName: 'String', proto: String.prototype },
+    { protoName: 'NodeList', proto: NodeList.prototype },
+    { protoName: 'Map', proto: Map.prototype },
+    { protoName: 'Set', proto: Set.prototype },
+    { protoName: 'Generator', proto: Generator.prototype },
+    { protoName: 'OrderedIterable', proto: OrderedIterable.prototype }
 ];
 
-function extendAllIterables(name, func) {
-    for(const proto of prototypes) {
-        if(proto.proto[name]) {
-            throw new Error(`Cannot add extension method '${name}' to prototype ${proto.name} as it already has this property defined`);
-        }
-        Object.defineProperty(proto.proto, name, {
-            writable: false,
-            value: function(...args) { 
-                // The commented code below would be preferred, but there is currently
-                // a bug in babel, so it transpiles to code that causes infinite recursion.
-                // return func(this, ...args);
-                return func.bind(null, this)(...args);
-            }
-        });
+const extensions = [];
+
+function extend(protoName, proto, funcName, func) {
+    if(proto[funcName]) {
+        throw new Error(`Cannot add extension method '${funcName}' to prototype ${protoName} as it already has this property defined`);
     }
+    Object.defineProperty(proto, funcName, {
+        writable: false,
+        value: function(...args) { 
+            // The commented code below would be preferred, but there is currently
+            // a bug in babel, so it transpiles to code that causes infinite recursion.
+            // return func(this, ...args);
+            return func.bind(null, this)(...args);
+        }
+    });
+}
+
+function registerIterable(proto, protoName) {
+    for(const { funcName, func } of extensions) {
+        extend(protoName, proto, funcName, func);
+    }
+    iterablePrototypes.push({ protoName, proto });
+}
+
+function registerIterableExtension(funcName, func) {
+    for(const { protoName, proto } of iterablePrototypes) {
+        extend(protoName, proto, funcName, func);
+    }
+    extensions.push({ funcName, func });
 }
 
 function* select(iterable, projection) {
     let i = 0;
     for(const element of iterable) yield projection(element, i++);
 }
-extendAllIterables("select", select);
+registerIterableExtension("select", select);
 
 function* where(iterable, predicate) {
     let i = 0;
     for(const element of iterable) if(predicate(element, i++)) yield element;
 }
-extendAllIterables("where", where);
+registerIterableExtension("where", where);
 
 function* selectMany(iterable, projection) {
     for(const element of iterable) {
         yield* (projection ? projection(element) : element);
     }
 }
-extendAllIterables("selectMany", selectMany);
-extendAllIterables("linqConcat", (...iterables) => selectMany(iterables));
+registerIterableExtension("selectMany", selectMany);
+registerIterableExtension("linqConcat", (...iterables) => selectMany(iterables));
 
 function allowsDirectAccess(iterable) {
     return iterable instanceof Array
@@ -106,7 +120,7 @@ function* skip(iterable, toSkip) {
         }
     }
 }
-extendAllIterables("skip", skip);
+registerIterableExtension("skip", skip);
 
 function* take(iterable, toTake) {
     for(const element of iterable) {
@@ -114,7 +128,7 @@ function* take(iterable, toTake) {
         else break;
     }
 }
-extendAllIterables("take", take);
+registerIterableExtension("take", take);
 
 function count(iterable, predicate) {
     if(iterable.length !== undefined && !predicate) return iterable.length;
@@ -124,7 +138,7 @@ function count(iterable, predicate) {
     }
     return count;
 }
-extendAllIterables("count", count);
+registerIterableExtension("count", count);
 
 function firstOrDefault(iterable, predicate, defaultValue) {
     for(const element of iterable) {
@@ -132,7 +146,7 @@ function firstOrDefault(iterable, predicate, defaultValue) {
     }
     return defaultValue;
 }
-extendAllIterables("firstOrDefault", firstOrDefault);
+registerIterableExtension("firstOrDefault", firstOrDefault);
 
 function first(iterable, predicate) {
     for(const element of iterable) {
@@ -140,7 +154,7 @@ function first(iterable, predicate) {
     }
     throw new Error('Sequence contained no elements');
 }
-extendAllIterables("first", first);
+registerIterableExtension("first", first);
 
 function lastOrDefault(iterable, predicate, defaultValue) {
     let lastMatch = defaultValue;
@@ -149,7 +163,7 @@ function lastOrDefault(iterable, predicate, defaultValue) {
     }
     return lastMatch;
 }
-extendAllIterables("lastOrDefault", lastOrDefault);
+registerIterableExtension("lastOrDefault", lastOrDefault);
 
 function last(iterable, predicate) {
     let gotMatch = false;
@@ -163,7 +177,7 @@ function last(iterable, predicate) {
     if(!gotMatch) throw new Error('Sequence contained no elements');
     return lastMatch;
 }
-extendAllIterables("last", last);
+registerIterableExtension("last", last);
 
 function singleOrDefault(iterable, predicate, defaultValue) {
     let foundElement = false;
@@ -177,7 +191,7 @@ function singleOrDefault(iterable, predicate, defaultValue) {
     }
     return firstElement;
 }
-extendAllIterables("singleOrDefault", singleOrDefault);
+registerIterableExtension("singleOrDefault", singleOrDefault);
 
 function single(iterable, predicate) {
     let foundElement = false;
@@ -192,7 +206,7 @@ function single(iterable, predicate) {
     if(!foundElement) throw new Error('Sequence contained no elements');
     else return firstElement;
 }
-extendAllIterables("single", single);
+registerIterableExtension("single", single);
 
 function any(iterable, predicate) {
     for(const element of iterable) {
@@ -200,7 +214,7 @@ function any(iterable, predicate) {
     }
     return false;
 }
-extendAllIterables("any", any);
+registerIterableExtension("any", any);
 
 function all(iterable, predicate) {
     for(const element of iterable) {
@@ -208,7 +222,7 @@ function all(iterable, predicate) {
     }
     return true;
 }
-extendAllIterables("all", all);
+registerIterableExtension("all", all);
 
 function contains(iterable, toFind) {
     if(iterable instanceof Set) return iterable.has(toFind);
@@ -217,7 +231,7 @@ function contains(iterable, toFind) {
     }
     return false;
 }
-extendAllIterables("contains", contains);
+registerIterableExtension("contains", contains);
 
 function max(iterable, projection) {
     let max;
@@ -227,7 +241,7 @@ function max(iterable, projection) {
     }
     return max;
 }
-extendAllIterables("max", max);
+registerIterableExtension("max", max);
 
 function min(iterable, projection) {
     let min;
@@ -237,7 +251,7 @@ function min(iterable, projection) {
     }
     return min;
 }
-extendAllIterables("min", min);
+registerIterableExtension("min", min);
 
 function sum(iterable, projection) {
     let sum = 0;
@@ -246,7 +260,7 @@ function sum(iterable, projection) {
     }
     return sum;
 }
-extendAllIterables("sum", sum);
+registerIterableExtension("sum", sum);
 
 function average(iterable, projection) {
     let sum = 0;
@@ -257,7 +271,7 @@ function average(iterable, projection) {
     }
     return sum / count;
 }
-extendAllIterables("average", average);
+registerIterableExtension("average", average);
 
 function toArray(iterable, projection) {
     const array = new Array(iterable.length);
@@ -267,7 +281,7 @@ function toArray(iterable, projection) {
     }
     return array;
 }
-extendAllIterables("toArray", toArray);
+registerIterableExtension("toArray", toArray);
 
 function toMap(iterable, keyProjection, valueProjection) {
     const map = new Map();
@@ -276,7 +290,7 @@ function toMap(iterable, keyProjection, valueProjection) {
     }
     return map;
 }
-extendAllIterables("toMap", toMap);
+registerIterableExtension("toMap", toMap);
 
 function toSet(iterable, projection) {
     const set = new Set();
@@ -285,7 +299,7 @@ function toSet(iterable, projection) {
     };
     return set;
 }
-extendAllIterables("toSet", toSet);
+registerIterableExtension("toSet", toSet);
 
 function groupBy(iterable, keyProjection) {
     const groups = new Map();
@@ -296,7 +310,7 @@ function groupBy(iterable, keyProjection) {
     }
     return groups;
 }
-extendAllIterables("groupBy", groupBy);
+registerIterableExtension("groupBy", groupBy);
 
 function* zip(...iterables) {
     const iterators = iterables.map(i => i[Symbol.iterator]());
@@ -310,7 +324,7 @@ function* zip(...iterables) {
         yield results;
     }
 }
-extendAllIterables("zip", zip);
+registerIterableExtension("zip", zip);
 
 function* union(...iterables) {
     const allElements = new Set();
@@ -323,8 +337,8 @@ function* union(...iterables) {
         }
     }
 }
-extendAllIterables("union", union);
-extendAllIterables("distinct", iterable => union(iterable));
+registerIterableExtension("union", union);
+registerIterableExtension("distinct", iterable => union(iterable));
 
 function* intersect(...iterables) {
     if(iterables.length === 0) return;
@@ -350,7 +364,7 @@ function* intersect(...iterables) {
         if(appearances.size === iterables.length) yield element;
     }
 }
-extendAllIterables("intersect", intersect);
+registerIterableExtension("intersect", intersect);
 
 function* except(iterable, ...toFilter) {
     if(!toFilter.length) {
@@ -367,41 +381,41 @@ function* except(iterable, ...toFilter) {
         if(!allToRemove.has(element)) yield element;
     }
 }
-extendAllIterables("except", except);
+registerIterableExtension("except", except);
 
 function orderBy(iterable, sortProjection) {
     return new OrderedIterable(iterable, sortProjection, false);
 }
-extendAllIterables("orderBy", orderBy);
+registerIterableExtension("orderBy", orderBy);
 
 function thenBy(orderedIterable, sortProjection) {
     orderedIterable.addSort(sortProjection, false);
     return orderedIterable;
 }
-extendAllIterables("thenBy", thenBy);
+registerIterableExtension("thenBy", thenBy);
 
 function orderByDescending(iterable, sortProjection) {
     return new OrderedIterable(iterable, sortProjection, true);
 }
-extendAllIterables("orderByDescending", orderByDescending);
+registerIterableExtension("orderByDescending", orderByDescending);
 
 function thenByDescending(orderedIterable, sortProjection) {
     orderedIterable.addSort(sortProjection, true);
     return orderedIterable;
 }
-extendAllIterables("thenByDescending", thenByDescending);
+registerIterableExtension("thenByDescending", thenByDescending);
 
 function* append(iterable, ...elements) {
     yield* iterable;
     yield* elements;
 }
-extendAllIterables("append", append);
+registerIterableExtension("append", append);
 
 function* prepend(iterable, ...elements) {
     yield* elements;
     yield* iterable;
 }
-extendAllIterables("prepend", prepend);
+registerIterableExtension("prepend", prepend);
 
 function* defaultIfEmpty(iterable, defaultValue) {
     let anyElements = false;
@@ -411,7 +425,7 @@ function* defaultIfEmpty(iterable, defaultValue) {
     }
     if(!anyElements) yield defaultValue;
 }
-extendAllIterables("defaultIfEmpty", defaultIfEmpty);
+registerIterableExtension("defaultIfEmpty", defaultIfEmpty);
 
 function* linqReverse(iterable) {
     let array;
@@ -428,7 +442,7 @@ function* linqReverse(iterable) {
         yield array[i];
     }
 }
-extendAllIterables("linqReverse", linqReverse);
+registerIterableExtension("linqReverse", linqReverse);
 
 function sequenceEqual(iterable, other) {
     if(iterable.length !== undefined && other.length !== undefined && iterable.length !== other.length) return false;
@@ -441,7 +455,7 @@ function sequenceEqual(iterable, other) {
         if(result.value !== otherResult.value) return false;
     }
 }
-extendAllIterables("sequenceEqual", sequenceEqual);
+registerIterableExtension("sequenceEqual", sequenceEqual);
 
 function* skipWhile(iterable, predicate) {
     let skipping = true;
@@ -450,7 +464,7 @@ function* skipWhile(iterable, predicate) {
         if(!skipping) yield element;
     }
 }
-extendAllIterables("skipWhile", skipWhile);
+registerIterableExtension("skipWhile", skipWhile);
 
 function* takeWhile(iterable, predicate) {
     for(const element of iterable) {
@@ -458,7 +472,7 @@ function* takeWhile(iterable, predicate) {
         yield element;
     }
 }
-extendAllIterables("takeWhile", takeWhile);
+registerIterableExtension("takeWhile", takeWhile);
 
 function* linqJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     // If we can determine the lengths of the sequences
@@ -486,7 +500,7 @@ function* linqJoin(iterable, other, keyProjection, otherKeyProjection, resultPro
         }
     }
 }
-extendAllIterables("linqJoin", linqJoin);
+registerIterableExtension("linqJoin", linqJoin);
 
 function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     const grouped = other.groupBy(otherKeyProjection);
@@ -495,7 +509,7 @@ function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultPr
         yield resultProjection(element, matching);
     }
 }
-extendAllIterables("groupJoin", groupJoin);
+registerIterableExtension("groupJoin", groupJoin);
 
 function aggregate(iterable, accumulator, seed, resultProjection) {
     let accumulatorValue = seed;
@@ -504,7 +518,7 @@ function aggregate(iterable, accumulator, seed, resultProjection) {
     }
     return resultProjection ? resultProjection(accumulatorValue) : accumulatorValue;
 }
-extendAllIterables("aggregate", aggregate);
+registerIterableExtension("aggregate", aggregate);
 
 function elementAt(iterable, index) {
     if(allowsDirectAccess(iterable)) {
@@ -517,7 +531,7 @@ function elementAt(iterable, index) {
     }
     throw new Error('Index was beyond the end of the sequence');
 }
-extendAllIterables("elementAt", elementAt);
+registerIterableExtension("elementAt", elementAt);
 
 function elementAtOrDefault(iterable, index, defaultValue) {
     if(allowsDirectAccess(iterable)) {
@@ -530,7 +544,7 @@ function elementAtOrDefault(iterable, index, defaultValue) {
     }
     return defaultValue;
 }
-extendAllIterables("elementAtOrDefault", elementAtOrDefault);
+registerIterableExtension("elementAtOrDefault", elementAtOrDefault);
 
 function* skipLast(iterable, toSkip) {
     const array = allowsDirectAccess(iterable) ? iterable : iterable.toArray();
@@ -539,7 +553,7 @@ function* skipLast(iterable, toSkip) {
         yield array[i];
     }
 }
-extendAllIterables("skipLast", skipLast);
+registerIterableExtension("skipLast", skipLast);
 
 function* takeLast(iterable, toTake) {
     const array = allowsDirectAccess(iterable) ? iterable : iterable.toArray();
@@ -548,7 +562,7 @@ function* takeLast(iterable, toTake) {
         yield array[i];
     }
 }
-extendAllIterables("takeLast", takeLast);
+registerIterableExtension("takeLast", takeLast);
 
 function aggregateBy(iterable, keyProjection, seedProjection, accumulator, resultProjection) {
     const map = new Map();
@@ -565,7 +579,7 @@ function aggregateBy(iterable, keyProjection, seedProjection, accumulator, resul
     }
     return map;
 }
-extendAllIterables("aggregateBy", aggregateBy);
+registerIterableExtension("aggregateBy", aggregateBy);
 
 function* getChunk(iterator, chunkSize, outResult) {
     let toYield = chunkSize;
@@ -585,4 +599,4 @@ function* chunkBy(iterable, chunkSize) {
         yield getChunk(iterator, chunkSize, result);
     }
 }
-extendAllIterables("chunkBy", chunkBy);
+registerIterableExtension("chunkBy", chunkBy);
