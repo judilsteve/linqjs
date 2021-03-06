@@ -449,3 +449,36 @@ test('Any', () => {
 });
 
 // All
+
+test('All: No elements', () => {
+    expect([].all(x => x % 2 === 0)).toBe(true);
+});
+
+test('All: Mismatch', () => {
+    expect([{val: 2}, {val: 4}, {val: 5}, null].all(x => x.val % 2 === 0)).toBe(false);
+});
+
+test('All', () => {
+    expect([2,4,6,8].all(x => x % 2 === 0)).toBe(true);
+});
+
+// Contains
+
+function* generateThenThrow(array) {
+    yield* array;
+    throw new Error('Sequence was enumerated further than expected');
+}
+
+test('Contains: No elements', () => {
+    expect([].contains(1)).toBe(false);
+});
+
+test('Contains: No match', () => {
+    expect([2,3].contains(1)).toBe(false);
+});
+
+test('Contains', () => {
+    expect(generateThenThrow([2,3,1]).contains(1)).toBe(true);
+});
+
+// Max
