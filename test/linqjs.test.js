@@ -926,3 +926,133 @@ test('GroupJoin', () => {
 });
 
 // Aggregate
+
+test('Aggregate: No seed, no result projection', () => {
+    expect([1,2,3].aggregate((sum, next) => (sum ?? 0) + next)).toBe(6);
+});
+
+test('Aggregate: No result projection', () => {
+    expect([1,2,3].aggregate((sum, next) => sum + next, 0)).toBe(6);
+});
+
+test('Aggregate', () => {
+    expect([1,2,3].aggregate((sum, next) => sum + next, 0, x => x + 2)).toBe(8);
+});
+
+// ElementAt
+
+test('ElementAt: With length, index past end', () => {
+    expect(() => [1,2,3].elementAt(3)).toThrow('Index was beyond the end of the sequence');
+});
+
+test('ElementAt: With length', () => {
+    expect([1,2,3].elementAt(1)).toBe(2);
+});
+
+test('ElementAt: Index past end', () => {
+    expect(() => generate([1,2,3]).elementAt(3)).toThrow('Index was beyond the end of the sequence');
+});
+
+test('ElementAt', () => {
+    expect(generateThenThrow([1,2,3]).elementAt(2)).toBe(3);
+});
+
+// ElementAtOrDefault
+
+test('ElementAtOrDefault: With length, index past end', () => {
+    expect([1,2,3].elementAtOrDefault(3, 'default')).toBe('default');
+});
+
+test('ElementAtOrDefault: With length', () => {
+    expect([1,2,3].elementAtOrDefault(1, 'default')).toBe(2);
+});
+
+test('ElementAtOrDefault: Index past end', () => {
+    expect(generate([1,2,3]).elementAtOrDefault(3, 'default')).toBe('default');
+});
+
+test('ElementAtOrDefault', () => {
+    expect(generateThenThrow([1,2,3]).elementAtOrDefault(2, 'default')).toBe(3);
+});
+
+// SkipLast
+
+test('SkipLast: Direct access, skip whole sequence', () => {
+    expectAsArray([1,2,3].skipLast(4)).toStrictEqual([]);
+});
+
+test('SkipLast: Direct access', () => {
+    expectAsArray([1,2,3].skipLast(1)).toStrictEqual([1,2]);
+});
+
+test('SkipLast: Skip whole sequence', () => {
+    expectAsArray(generate([1,2,3]).skipLast(4)).toStrictEqual([]);
+});
+
+test('SkipLast', () => {
+    expectAsArray(generate([1,2,3]).skipLast(1)).toStrictEqual([1,2]);
+});
+
+// TakeLast
+
+test('TakeLast: Direct access, Take whole sequence', () => {
+    expectAsArray([1,2,3].takeLast(4)).toStrictEqual([1,2,3]);
+});
+
+test('TakeLast: Direct access', () => {
+    expectAsArray([1,2,3].takeLast(2)).toStrictEqual([2,3]);
+});
+
+test('TakeLast: Take whole sequence', () => {
+    expectAsArray(generate([1,2,3]).takeLast(4)).toStrictEqual([1,2,3]);
+});
+
+test('TakeLast', () => {
+    expectAsArray(generate([1,2,3]).takeLast(2)).toStrictEqual([2,3]);
+});
+
+// AggregateBy
+
+test('AggregateBy: No result projection', () => {
+    const expected = new Map();
+    expected.set(1, 11);
+    expected.set(2, 22);
+    expected.set(3, 7);
+    expect([
+        {k: 1, v: 1},
+        {k: 2, v: 5},
+        {k: 3, v: 2},
+        {k: 1, v: 7},
+        {k: 2, v: 2},
+        {k: 2, v: 8},
+        {k: 1, v: 1},
+    ].aggregateBy(x => x.k, (k, x) => k + x.v, (sum, next) => sum + next.v))
+    .toStrictEqual(expected);
+});
+
+test('AggregateBy', () => {
+    const expected = new Map();
+    expected.set(1, 16);
+    expected.set(2, 27);
+    expected.set(3, 12);
+    expect([
+        {k: 1, v: 1},
+        {k: 2, v: 5},
+        {k: 3, v: 2},
+        {k: 1, v: 7},
+        {k: 2, v: 2},
+        {k: 2, v: 8},
+        {k: 1, v: 1},
+    ].aggregateBy(x => x.k, (k, x) => k + x.v, (sum, next) => sum + next.v, sum => sum + 5))
+    .toStrictEqual(expected);
+});
+
+// ChunkBy
+
+test('ChunkBy: Empty input', () => {
+    expectAsArray([].chunkBy(3).select(x => [...x])).toStrictEqual([]);
+});
+
+test('ChunkBy', () => {
+    expectAsArray([1,2,3,4,5,6,7,8].chunkBy(3).select(x => [...x])).toStrictEqual([[1,2,3],[4,5,6],[7,8]]);
+});

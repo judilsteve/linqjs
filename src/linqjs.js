@@ -530,7 +530,7 @@ function elementAt(iterable, index) {
         return iterable[index];
     }
     let i = 0;
-    for(const element of sequence) {
+    for(const element of iterable) {
         if(i++ === index) return element;
     }
     throw new Error('Index was beyond the end of the sequence');
@@ -543,7 +543,7 @@ function elementAtOrDefault(iterable, index, defaultValue) {
         return iterable[index];
     }
     let i = 0;
-    for(const element of sequence) {
+    for(const element of iterable) {
         if(i++ === index) return element;
     }
     return defaultValue;
