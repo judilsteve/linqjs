@@ -508,8 +508,9 @@ registerIterableExtension("linqJoin", linqJoin);
 function* groupJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     const grouped = other.groupBy(otherKeyProjection);
     for(const element of iterable) {
-        const matching = grouped.get(keyProjection(element));
-        yield resultProjection(element, matching);
+        const key = keyProjection(element);
+        if(!grouped.has(key)) continue;
+        yield resultProjection(element, grouped.get(key));
     }
 }
 registerIterableExtension("groupJoin", groupJoin);
