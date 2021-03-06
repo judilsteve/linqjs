@@ -482,3 +482,39 @@ test('Contains', () => {
 });
 
 // Max
+
+test('Max: No elements, no projection', () => {
+    expect([].max()).toBe(undefined);
+});
+
+test('Max: No elements', () => {
+    expect([].max(x => x + 1)).toBe(undefined);
+});
+
+test('Max: No projection', () => {
+    expect([1,2,4,3].max()).toBe(4);
+});
+
+test('Max', () => {
+    expect([1,2,4,3].max(x => x + 1)).toBe(5);
+});
+
+// Min
+
+test('Min: No elements, no projection', () => {
+    expect([].min()).toBe(undefined);
+});
+
+test('Min: No elements', () => {
+    expect([].min(x => x + 1)).toBe(undefined);
+});
+
+test('Min: No projection', () => {
+    expect([2,1,4,3].min()).toBe(1);
+});
+
+test('Min', () => {
+    expect([2,1,4,3].min(x => x + 1)).toBe(2);
+});
+
+// Sum

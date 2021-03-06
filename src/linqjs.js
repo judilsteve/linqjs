@@ -269,6 +269,7 @@ function average(iterable, projection) {
         sum += projection ? projection(element) : element;
         count++;
     }
+    if(count === 0) throw new Error('Sequence contains no elements.');
     return sum / count;
 }
 registerIterableExtension("average", average);
