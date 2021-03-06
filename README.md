@@ -42,12 +42,14 @@ const sortedFullNames = [
 ## Differences from .NET 5.0 Implementation
 
  - All method names are in `camelCase` instead of `PascalCase`
- - The `Aggregate` method always takes its seed value as the *third* argument. This is because JavaScript does not support method overloads like C# does, so optional parameters are used instead.
+ - The `aggregate` method always takes its seed value as the *third* argument. This is because JavaScript does not support method overloads like C# does, so optional parameters are used instead.
+ - The arguments to the `zip` function have been re-ordered so that the result projection is the first argument. This allows the function to zip an arbitrary number of sequences together, whearas the C# version can only deal with two.
  - Methods concerning the C# type system (e.g. `Cast`, `AsEnumerable`, `LongCount`, `OfType`) have not been ported.
  - Non-extension methods (e.g. `Empty`, `Range`, `Repeat`) have not been ported.
- - `ToDictionary` has been renamed `ToMap`, to reflect its use of the native JavaScript `Map`.
+ - `ToDictionary` has been renamed `toMap`, to reflect its use of the native JavaScript `Map`. Unlike `ToDictionary`, `toMap` will not throw if the same key is found twice in the input sequence.
  - `GroupBy` returns a JavaScript `Map` (where each value is an `Array`) instead of an `IEnumerable<IGrouping>`.
- - `ToHashSet` has been renamed `ToSet`, to reflect its use of the native JavaScript `Set`.
+ - In C#, the overloads of `Min`/`Max` that return nullable values return `null` when the input sequence is empty. However, non-nullable overloads throw in this case. Since there is no such distinction in JavaScript, `min`/`max` always returns `undefined` when the sequence is empty.
+ - `ToHashSet` has been renamed `toSet`, to reflect its use of the native JavaScript `Set`.
  - `ToList` has not been ported, as JavaScript `Array`s already have mutable length.
  - The following methods have had `linq` prepended to their name (e.g. `Concat` becomes `linqConcat`) to avoid conflicting with built-in methods: `Concat`, `Reverse`, `Join`.
 
