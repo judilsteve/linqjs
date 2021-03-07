@@ -1,11 +1,13 @@
 import { registerIterable, registerIterableExtension } from '../src/registry';
 
-test("Register Iterable, then extend", () => {
+// NOTE: Iterables and extensions registered in each test persist throughout the whole test suite.
+
+test("Register iterable, then extend", () => {
     const x = { v: 42 };
-    registerIterable('myIterable', x); // TODO Does this persist across tests? What about suites?
+    registerIterable('myIterable', x);
 
     const extension = x => x.v;
-    registerIterableExtension('getV', extension); // TODO This appears to persist across tests. What about suites?
+    registerIterableExtension('getV', extension);
 
     expect(x.getV()).toBe(42);
 });
@@ -20,4 +22,19 @@ test("Register extension, then iterable", () => {
     expect(x.getV2()).toBe(42);
 });
 
-// TODO Test adding iterables/extensions that already exist
+test('Register iterable that has already been registered', () => {
+    registerIterable('myIterable3', {});
+    expect(() => registerIterable('myIterable3', {}))
+        .toThrow("An iterable with the name 'myIterable3' has already been registered");
+});
+
+test('Register extension that has already been registered', () => {
+    registerIterableExtension('getV3', () => {});
+    expect(() => registerIterableExtension('getV3', () => {}))
+        .toThrow("An extension method with the name 'getV3' has already been registered");
+});
+
+test('Register extension with same name as built-in method', () => {
+    expect(() => registerIterableExtension('concat', () => {}))
+        .toThrow("Cannot add extension method 'concat' to iterable Array as it already has this property defined");
+});

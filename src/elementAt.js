@@ -1,5 +1,5 @@
 import { registerIterableExtension } from './registry';
-import { allowsDirectAccess } from './utils';
+import { allowsDirectAccess } from './internal/utils'
 
 function elementAt(iterable, index) {
     if(allowsDirectAccess(iterable)) {

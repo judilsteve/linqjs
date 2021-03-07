@@ -1,5 +1,5 @@
 import { registerIterableExtension } from './registry';
-import './groupBy'; // TODO This should not be here
+import { groupBy } from './internal/groupBy';
 
 function* linqJoin(iterable, other, keyProjection, otherKeyProjection, resultProjection) {
     // If we can determine the lengths of the sequences
@@ -20,7 +20,7 @@ function* linqJoin(iterable, other, keyProjection, otherKeyProjection, resultPro
         orderedResultProjection = resultProjection;
     }
 
-    const grouped = smaller.groupBy(smallerKeyProjection);
+    const grouped = groupBy(smaller, smallerKeyProjection);
     for(const element of larger) {
         const key = largerKeyProjection(element);
         if(!grouped.has(key)) continue;

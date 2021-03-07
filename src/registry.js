@@ -1,22 +1,20 @@
 // This doesn't exist in the global namespace
 const Generator = Object.getPrototypeOf(function* () {});
 
-// TODO Make this a dictionary so that we can validate that names are unique
-const iterablePrototypes = [
-    { protoName: 'Array', proto: Array.prototype },
-    { protoName: 'String', proto: String.prototype },
-    { protoName: 'NodeList', proto: NodeList.prototype },
-    { protoName: 'Map', proto: Map.prototype },
-    { protoName: 'Set', proto: Set.prototype },
-    { protoName: 'Generator', proto: Generator.prototype }
-];
+const iterablePrototypes = {
+    'Array': Array.prototype,
+    'String': String.prototype,
+    'NodeList': NodeList.prototype,
+    'Map': Map.prototype,
+    'Set': Set.prototype,
+    'Generator': Generator.prototype
+};
 
-// TODO Make this a dictionary so that we can validate that names are unique
-const extensions = [];
+const extensions = {};
 
 function extend(protoName, proto, funcName, func) {
     if(proto[funcName]) {
-        throw new Error(`Cannot add extension method '${funcName}' to prototype ${protoName} as it already has this property defined`);
+        throw new Error(`Cannot add extension method '${funcName}' to iterable ${protoName} as it already has this property defined`);
     }
     Object.defineProperty(proto, funcName, {
         writable: false,
@@ -30,15 +28,17 @@ function extend(protoName, proto, funcName, func) {
 }
 
 export function registerIterable(protoName, proto) {
-    for(const { funcName, func } of extensions) {
+    if(iterablePrototypes[protoName]) throw new Error (`An iterable with the name '${protoName}' has already been registered`);
+    for(const [funcName, func] of Object.entries(extensions)) {
         extend(protoName, proto, funcName, func);
     }
-    iterablePrototypes.push({ protoName, proto });
+    iterablePrototypes[protoName] = proto;
 }
 
 export function registerIterableExtension(funcName, func) {
-    for(const { protoName, proto } of iterablePrototypes) {
+    if(extensions[funcName]) throw new Error (`An extension method with the name '${funcName}' has already been registered`);
+    for(const [protoName, proto] of Object.entries(iterablePrototypes)) {
         extend(protoName, proto, funcName, func);
     }
-    extensions.push({ funcName, func });
+    extensions[funcName] = func;
 }

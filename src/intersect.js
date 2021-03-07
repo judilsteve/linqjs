@@ -1,13 +1,12 @@
 import { registerIterableExtension } from './registry';
-import './toSet'; // TODO This does not belong here
 
 function* intersect(...iterables) {
     if(iterables.length === 0) return;
     else if(iterables.length === 1) {
-        yield* iterables[0].toSet();
+        yield* new Set(iterables[0]);
         return;
     } else if(iterables.length === 2) {
-        const set = iterables[0].toSet();
+        const set = new Set(iterables[0]);
         for(const element of iterables[1]) {
             if(set.has(element)) yield element;
         }
