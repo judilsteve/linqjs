@@ -9,7 +9,13 @@ The methods on the [Enumerable class in .NET 5.0](https://docs.microsoft.com/en-
 
 Unlike built-in `filter`  and `map` methods, most methods in LinqJS do not allocate memory for new arrays unless you specifically call `toArray` or a similar method at the end of your chain. All methods in LinqJS that have sequence-valued return types can be iterated over via [for...of syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of).
 
-## Usage example:
+## Installation:
+
+```
+npm i --save @judilsteve/linqjs
+```
+
+## Usage:
 
 ```javascript
 import { registerIterable } from 'linqjs/registry';
@@ -37,15 +43,15 @@ class Range {
         return new RangeIterator(this.start, this.end);
     }
 }
-// Use 'registerIterable' to add LinqJs methods to any object or prototype with a [Symbol.iterator]() function
+// Use 'registerIterable' to add LinqJS methods to any object or prototype with a [Symbol.iterator]() function
 registerIterable('Range', Range.prototype);
 
-// By default, LinqJs methods work on Arrays, Strings, Maps, Sets, and Generators
+// By default, LinqJS methods work on Arrays, Strings, Maps, Sets, and Generators
 const evenPerfectSquares = new Range(0,10)
     .select(x => Math.pow(x, 2))
     .where(x => x % 2 === 0);
 
-// Results of LinqJs method chains can be iterated using for...of
+// Results of LinqJS method chains can be iterated using for...of
 for(const element of evenPerfectSquares) {
     console.log(element);
 }
