@@ -75,6 +75,14 @@ for(const element of evenPerfectSquares) {
 
  - To use LinqJS in environments that do not support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators), you will need to transpile LinqJS. If you decide to use [babel](https://babeljs.io/) to do this, you will need to import the [regenerator-runtime](https://www.npmjs.com/package/regenerator-runtime) module into your project so that the transpiled generator functions can be run.
 
+## "But wait, isn't that prototype pollution?"
+
+Technically, yes, but prototype pollution is usually regarded as bad because packages pollute prototypes *without* the programmer who imports the package knowing this. For example, you pull in a library that redefines a built-in function on Array which you already use throughout your project, and weird bugs start occurring that you can't track down, because you were expecting calls to that function to do one thing, but now they're doing another. If you're importing this library, though, you're explicitly requesting that LINQ functions be added to the Array/String/etc prototypes. **That said, if you're developing a library to be used by others, don't use LinqJS. If you do, then everyone who imports your library will be unknowingly polluting prototypes throughout their application.**
+
+LinqJS also uses some safeguards when extending prototypes: It will only add methods, not overwrite them. If you import a LINQ method and one of the registered prototypes already has a property with that name, you'll get an error. When LinqJS adds a method, it does so using Object.defineProperty, and adds it as a non-writable, non-enumerable property. This means the extension methods won't show up when you try to enumerate the keys of the object, and it also means that if anything else in your project tries to redefine or modify that property, then an error will be thrown.
+
+If that's still not cool with you, I'd invite you to check out some of the other LINQ ports for js that don't use prototype pollution. However, these usually require you to do something like `enumerable([]).where(...)` to kick off your method chains, instead of just using `[].where(...)`.
+
 ## Extras
 
  - `aggregateBy` method which combines `groupBy` and `aggregate` into a single operation. `aggregateBy` is more performant than calling `groupBy` and then `aggregate` on each group, since it only traverses the source sequence once, does not need to create temporary arrays to hold the elements of each group.
