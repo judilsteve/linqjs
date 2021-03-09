@@ -1,4 +1,4 @@
-import '../src/aggregateBy';
+import '../aggregateBy';
 
 test('AggregateBy: No result projection', () => {
     const expected = new Map();

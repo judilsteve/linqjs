@@ -1,4 +1,4 @@
-import '../src/linqReverse';
+import '../linqReverse';
 import { expectAsArray, generate } from './utils';
 
 test('LinqReverse: Direct access', () => {

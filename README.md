@@ -12,31 +12,43 @@ Unlike built-in `filter`  and `map` methods, most methods in LinqJS do not alloc
 ## Usage example:
 
 ```javascript
-const sortedFullNames = [
-    {
-        firstName: "Bruce",
-        lastName: "Wayne"
-    },
-    {
-        firstName: "Bruce",
-        lastName: "Campbell"
-    },
-    {
-        firstName: "Ash",
-        lastName: "Williams"
-    }
-]
-    .orderBy(x => x.firstName)
-    .thenBy(x => x.lastName)
-    .select(x => `${x.firstName} ${x.lastName}`)
-    .toArray();
+import { registerIterable } from 'linqjs/registry';
+import 'linqjs/select';
+import 'linqjs/where';
 
-// The returned value:
-[
-    "Ash Williams",
-    "Bruce Campbell",
-    "Bruce Wayne"
-];
+class RangeIterator {
+    constructor(start, end) {
+        this.current = start;
+        this.end = end;
+    }
+
+    next() {
+        return { value: this.current++, done: this.current > this.end };
+    }
+}
+
+class Range {
+    constructor(start, end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    [Symbol.iterator]() {
+        return new RangeIterator(this.start, this.end);
+    }
+}
+// Use 'registerIterable' to add LinqJs methods to any object or prototype with a [Symbol.iterator]() function
+registerIterable('Range', Range.prototype);
+
+// By default, LinqJs methods work on Arrays, Strings, Maps, Sets, and Generators
+const evenPerfectSquares = new Range(0,10)
+    .select(x => Math.pow(x, 2))
+    .where(x => x % 2 === 0);
+
+// Results of LinqJs method chains can be iterated using for...of
+for(const element of evenPerfectSquares) {
+    console.log(element);
+}
 ```
 
 ## Differences from .NET 5.0 Implementation

@@ -1,4 +1,4 @@
-import '../src/any';
+import '../any';
 
 test('Any: No elements, no predicate', () => {
     expect([].any()).toBe(false);

@@ -1,4 +1,4 @@
-import '../src/toArray';
+import '../toArray';
 
 test('ToArray: No elements, no projection', () => {
     const original = [];

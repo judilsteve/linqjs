@@ -1,4 +1,4 @@
-import '../src/takeWhile';
+import '../takeWhile';
 import { expectAsArray } from './utils';
 
 test('TakeWhile', () => {

@@ -1,4 +1,4 @@
-import '../src/elementAtOrDefault';
+import '../elementAtOrDefault';
 import { generate, generateThenThrow } from './utils';
 
 test('ElementAtOrDefault: With length, index past end', () => {

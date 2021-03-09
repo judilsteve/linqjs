@@ -1,4 +1,4 @@
-import '../src/distinct';
+import '../distinct';
 import { expectAsArray } from './utils';
 
 test('Distinct', () => {

@@ -1,4 +1,4 @@
-import '../src/aggregate';
+import '../aggregate';
 
 test('Aggregate: No seed, no result projection', () => {
     expect([1,2,3].aggregate((sum, next) => (sum ?? 0) + next)).toBe(6);

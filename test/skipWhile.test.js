@@ -1,4 +1,4 @@
-import '../src/skipWhile';
+import '../skipWhile';
 import { expectAsArray } from './utils';
 
 test('SkipWhile', () => {

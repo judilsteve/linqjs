@@ -1,4 +1,4 @@
-import '../src/except';
+import '../except';
 import { expectAsArray } from './utils';
 
 test('Except: No sequences', () => {

@@ -1,4 +1,4 @@
-import '../src/skip';
+import '../skip';
 import { generate } from './utils';
 import { expectAsArray } from './utils';
 

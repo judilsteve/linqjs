@@ -1,4 +1,4 @@
-import '../src/contains';
+import '../contains';
 import { generateThenThrow } from './utils';
 
 test('Contains: No elements', () => {

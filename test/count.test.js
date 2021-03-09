@@ -1,4 +1,4 @@
-import '../src/count';
+import '../count';
 import { generate } from './utils';
 
 test('Count: Empty sequence, no predicate, length property', () => {

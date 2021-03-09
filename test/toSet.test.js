@@ -1,4 +1,4 @@
-import '../src/toSet';
+import '../toSet';
 import { expectAsArray } from './utils';
 
 test('ToSet: No elements, no projection', () => {

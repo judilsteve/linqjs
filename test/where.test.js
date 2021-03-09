@@ -1,4 +1,4 @@
-import '../src/where';
+import '../where';
 import { expectAsArray } from './utils';
 
 test('Where: No elements', () => {

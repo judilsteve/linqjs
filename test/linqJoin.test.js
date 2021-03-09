@@ -1,6 +1,6 @@
-import '../src/linqJoin';
-import '../src/orderBy';
-import '../src/thenBy';
+import '../linqJoin';
+import '../orderBy';
+import '../thenBy';
 import { expectAsArray, generate } from './utils';
 
 test('LinqJoin: With lengths, shortest first', () => {

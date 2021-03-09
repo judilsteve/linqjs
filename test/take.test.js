@@ -1,4 +1,4 @@
-import '../src/take';
+import '../take';
 import { expectAsArray } from './utils';
 
 test('Take: Take whole sequence', () => {

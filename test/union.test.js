@@ -1,4 +1,4 @@
-import '../src/union';
+import '../union.js';
 import { expectAsArray } from './utils';
 
 test('Union: Empty sequences', () => {

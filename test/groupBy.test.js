@@ -1,4 +1,4 @@
-import '../src/groupBy';
+import '../groupBy';
 
 test('GroupBy: No elements', () => {
     expect([].groupBy(x => x % 2)).toStrictEqual(new Map());

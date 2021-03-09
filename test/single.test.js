@@ -1,4 +1,4 @@
-import '../src/single';
+import '../single';
 
 test('Single: No elements, no predicate', () => {
     expect(() => [].single()).toThrow('Sequence contained no elements');

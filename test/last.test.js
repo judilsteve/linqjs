@@ -1,4 +1,4 @@
-import '../src/last';
+import '../last';
 
 test('Last: No elements, no predicate', () => {
     expect(() => [].last()).toThrow('Sequence contained no elements');

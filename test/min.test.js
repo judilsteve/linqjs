@@ -1,4 +1,4 @@
-import '../src/min';
+import '../min';
 
 test('Min: No elements, no projection', () => {
     expect([].min()).toBe(undefined);

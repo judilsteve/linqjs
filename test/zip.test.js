@@ -1,4 +1,4 @@
-import '../src/zip';
+import '../zip';
 import { expectAsArray } from './utils';
 
 test('Zip: No result projection', () => {

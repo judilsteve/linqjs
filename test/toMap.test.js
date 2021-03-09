@@ -1,4 +1,4 @@
-import '../src/toMap';
+import '../toMap';
 
 test('ToMap: No elements, no value projection', () => {
     expect([].toMap(x => x)).toStrictEqual(new Map());

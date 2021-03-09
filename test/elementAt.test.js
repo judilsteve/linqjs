@@ -1,4 +1,4 @@
-import '../src/elementAt';
+import '../elementAt';
 import { generate, generateThenThrow } from './utils';
 
 test('ElementAt: With length, index past end', () => {

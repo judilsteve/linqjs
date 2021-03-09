@@ -1,4 +1,4 @@
-import '../src/takeLast';
+import '../takeLast';
 import { expectAsArray, generate } from './utils';
 
 test('TakeLast: Direct access, Take whole sequence', () => {

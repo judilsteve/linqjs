@@ -1,4 +1,4 @@
-import '../src/append';
+import '../append';
 import { expectAsArray } from './utils';
 
 test('Append', () => {

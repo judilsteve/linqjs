@@ -1,4 +1,4 @@
-import { registerIterable, registerIterableExtension } from '../src/registry';
+import { registerIterable, registerIterableExtension } from '../registry';
 
 // NOTE: Iterables and extensions registered in each test persist throughout the whole test suite.
 

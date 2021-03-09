@@ -1,4 +1,4 @@
-import '../src/firstOrDefault';
+import '../firstOrDefault';
 
 test('FirstOrDefault: No elements, no predicate, no default value', () => {
     expect([].firstOrDefault()).toBe(undefined);

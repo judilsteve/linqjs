@@ -1,4 +1,4 @@
-import '../src/first';
+import '../first';
 
 test('First: No elements, no predicate', () => {
     expect(() => [].first()).toThrow('Sequence contained no elements');

@@ -1,5 +1,5 @@
-import '../src/groupJoin';
-import '../src/orderBy';
+import '../groupJoin';
+import '../orderBy';
 import { expectAsArray } from './utils';
 
 test('GroupJoin', () => {

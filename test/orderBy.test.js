@@ -1,4 +1,4 @@
-import '../src/orderBy';
+import '../orderBy';
 import { expectAsArray } from './utils';
 
 test('OrderBy', () => {

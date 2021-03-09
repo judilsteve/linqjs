@@ -1,4 +1,4 @@
-import '../src/average';
+import '../average';
 
 test('Average: No elements, no projection', () => {
     expect(() => [].average()).toThrow('Sequence contained no elements');

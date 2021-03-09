@@ -1,5 +1,5 @@
-import '../src/chunkBy';
-import '../src/select';
+import '../chunkBy';
+import '../select';
 import { expectAsArray } from './utils';
 
 test('ChunkBy: Empty input', () => {

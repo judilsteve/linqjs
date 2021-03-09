@@ -1,4 +1,4 @@
-import '../src/prepend';
+import '../prepend';
 import { expectAsArray } from './utils';
 
 test('Prepend', () => {

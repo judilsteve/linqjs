@@ -1,4 +1,4 @@
-import '../src/skipLast';
+import '../skipLast';
 import { expectAsArray, generate } from './utils';
 
 test('SkipLast: Direct access, skip whole sequence', () => {

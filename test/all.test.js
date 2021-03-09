@@ -1,4 +1,4 @@
-import '../src/all';
+import '../all';
 
 test('All: No elements', () => {
     expect([].all(x => x % 2 === 0)).toBe(true);

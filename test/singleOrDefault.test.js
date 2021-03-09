@@ -1,4 +1,4 @@
-import '../src/singleOrDefault';
+import '../singleOrDefault';
 
 test('SingleOrDefault: No elements, no predicate, no default value', () => {
     expect([].singleOrDefault()).toBe(undefined);

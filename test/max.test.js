@@ -1,4 +1,4 @@
-import '../src/max';
+import '../max';
 
 test('Max: No elements, no projection', () => {
     expect([].max()).toBe(undefined);

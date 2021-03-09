@@ -1,4 +1,4 @@
-import '../src/intersect';
+import '../intersect';
 import { expectAsArray } from './utils';
 
 test('Intersect: Single sequence', () => {

@@ -1,6 +1,6 @@
-import '../src/thenBy';
-import '../src/orderBy';
-import '../src/orderByDescending';
+import '../thenBy';
+import '../orderBy';
+import '../orderByDescending';
 import { expectAsArray } from './utils';
 
 test('ThenBy: Descending first', () => {

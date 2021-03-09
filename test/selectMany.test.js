@@ -1,4 +1,4 @@
-import '../src/selectMany';
+import '../selectMany';
 import { expectAsArray } from './utils';
 
 test('SelectMany: No elements, no projection', () => {

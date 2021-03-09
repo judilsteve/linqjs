@@ -1,4 +1,4 @@
-import '../src/linqConcat';
+import '../linqConcat';
 import { expectAsArray } from './utils';
 
 test('LinqConcat: Empty source, single empty argument', () => {

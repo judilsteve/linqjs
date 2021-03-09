@@ -1,4 +1,4 @@
-import '../src/sequenceEqual';
+import '../sequenceEqual';
 import { generate, generateThenThrow } from './utils';
 
 test('SequenceEqual: With matched lengths, equal', () => {

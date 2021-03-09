@@ -1,4 +1,4 @@
-import '../src/select';
+import '../select';
 import { expectAsArray } from './utils';
 
 test('Select: No elements', () => {

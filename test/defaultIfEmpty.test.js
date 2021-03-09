@@ -1,4 +1,4 @@
-import '../src/defaultIfEmpty';
+import '../defaultIfEmpty';
 import { expectAsArray } from './utils';
 
 test('DefaultIfEmpty: Empty', () => {

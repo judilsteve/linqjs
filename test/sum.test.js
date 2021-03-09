@@ -1,4 +1,4 @@
-import '../src/sum';
+import '../sum';
 
 test('Sum: No elements, no projection', () => {
     expect([].sum()).toBe(0);
